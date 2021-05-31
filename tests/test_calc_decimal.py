@@ -1,8 +1,15 @@
+import pytest
 from modules.calc_decimal import calc_decimal
+
+@pytest.fixture
+def first():
+	print("Set up first fixture")
+	yield "not really needed, but an example of setting up a fixture. (appears if there's a test failure.)"
+	print("Clean up first fixture")
 
 # Tests for Base 10
 # Non-repeating periods.
-def test_1_5():
+def test_1_5(first):
 	result = calc_decimal(1, 5, 10)
 	assert result['period'] == '2' and result['repeating'] == 0
 
