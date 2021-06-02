@@ -6,6 +6,7 @@ sys.path.insert(1, os.path.dirname(os.path.realpath(__file__)))
 
 from modules.triples_c_minus_b import triples_for_c_minus_b
 from modules.triples_c import triples_for_c
+from modules.calc_decimal import calc_decimal
 
 # OUTPUT application/json
 def format_payload(data):
@@ -37,6 +38,16 @@ def pythag_c(c):
         # allow comma-delimited list of values in the URL
         c_list = list(map(lambda x: int(x), c.split(',')))
     return format_payload(triples_for_c(c_list))
+
+@app.route('/dc/<denom>', defaults={'num': 1, 'base': 10})
+@app.route('/dc/<denom>/<num>', defaults={'base': 10})
+@app.route('/dc/<denom>/<num>/<base>')
+def dc(denom, num, base):
+    denom = int(denom)
+    num = int(num)
+    base = int(base)
+    payload = calc_decimal(num, denom, base)
+    return format_payload(payload)
 
 @app.route('/phi', defaults={'power': 4})
 @app.route('/phi/<power>', methods=['GET'])
