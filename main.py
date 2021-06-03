@@ -7,6 +7,7 @@ sys.path.insert(1, os.path.dirname(os.path.realpath(__file__)))
 from modules.triples_c_minus_b import triples_for_c_minus_b
 from modules.triples_c import triples_for_c
 from modules.calc_decimal import calc_decimal
+from modules.phi import get_phi_power
 
 # OUTPUT application/json
 def format_payload(data):
@@ -39,9 +40,6 @@ def pythag_c(c):
         c_list = list(map(lambda x: int(x), c.split(',')))
     return format_payload(triples_for_c(c_list))
 
-# Decimal Calculator.
-# Accepts denominator and optional numerator and base.
-# Response payload includes decimal expansion period, tallies of repeating and non-repeating digits.
 @app.route('/dc/<denom>', defaults={'num': 1, 'base': 10})
 @app.route('/dc/<denom>/<num>', defaults={'base': 10})
 @app.route('/dc/<denom>/<num>/<base>')
@@ -56,8 +54,16 @@ def dc(denom, num, base):
 @app.route('/phi/<power>', methods=['GET'])
 def phi(power):
 	power = int(power)
-	#return json.dumps(phi_powers(power), indent=4, separators=(',', ': ')), 200, { 'Content-type': 'application/json'}
-	return format_payload(phi_powers(power))
+	return format_payload(get_phi_power(power))
+
+@app.route('/phi-list', defaults={'upto': 25})
+@app.route('/phi-list/<upto>')
+def phi_list(upto):
+    upto = int(upto)
+    payload = []
+    for power in range(1, upto + 1):
+        payload.append(get_phi_power(power))
+    return format_payload(payload)
 
 if __name__ == "__main__":
     app.run(debug=True)

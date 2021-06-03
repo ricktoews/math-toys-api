@@ -56,8 +56,8 @@ def phi(power):
 	power = int(power)
 	return format_payload(get_phi_power(power))
 
-@app.route('/phi_list', defaults={'upto': 25})
-@app.route('/phi_list/<upto>')
+@app.route('/phi-list', defaults={'upto': 25})
+@app.route('/phi-list/<upto>')
 def phi_list(upto):
     upto = int(upto)
     payload = []
