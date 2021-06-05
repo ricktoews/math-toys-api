@@ -11,6 +11,10 @@ from modules.phi import get_phi_power
 
 # OUTPUT application/json
 def format_payload(data):
+	data = {
+		'status': 'success',
+		'data': data
+	}
 	str = json.dumps(data, indent=4, separators=(',', ': '))
 	return str, 200, { 'Content-type': 'application/json' }
 
@@ -56,13 +60,14 @@ def phi(power):
 	power = int(power)
 	return format_payload(get_phi_power(power))
 
-@app.route('/phi-list', defaults={'upto': 25})
-@app.route('/phi-list/<upto>')
-def phi_list(upto):
+@app.route('/phi-list', defaults={'upto': 25, 'property': ''})
+@app.route('/phi-list/<upto>', defaults={'property': ''})
+@app.route('/phi-list/<upto>/<property>')
+def phi_list(upto, property):
     upto = int(upto)
     payload = []
     for power in range(1, upto + 1):
-        payload.append(get_phi_power(power))
+        payload.append(get_phi_power(power, property))
     return format_payload(payload)
 
 if __name__ == "__main__":

@@ -3,11 +3,10 @@ from modules.utils.build_pascal import build_triangle
 
 PASCAL = build_triangle()
 
-def get_phi_power(power):
+def get_phi_power(power, property=''):
 	whole = 0
 	root = 0
 	cancel = 2**(power - 1)
-	jacked_terms = []
 	for i in range(0, power+1):
 		if i%2 == 0:
 			add = PASCAL[power][power-i] * 5**(i/2)
@@ -28,4 +27,6 @@ def get_phi_power(power):
 		'real_value': real_value,
 		'fib_approx': fib_approx
 	}
+	if property != '':
+		payload = payload[property]
 	return payload
