@@ -56,6 +56,7 @@ def calc_decimal(reduced_num, reduced_denom, base):
 	repeating = repeating
 	period = ''.join(section_list)
 	decimal_object = {
+		"fraction": str(reduced_num) + ' / ' + str(reduced_denom),
 		"non_repeating": section_list[0],
 		"repeating_1": section_list[1],
 		"repeating_complement": section_list[2],

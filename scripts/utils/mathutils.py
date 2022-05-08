@@ -18,5 +18,13 @@ def is_prime(p):
 			break
 	return _result
 
-
-
+def distinct_primes(num):
+	prime_ndx = 0
+	primes = []
+	while PRIMES[prime_ndx] <= num:
+		prime = PRIMES[prime_ndx]
+		while num % prime == 0:
+			primes.append(prime)
+			num = num / prime	
+		prime_ndx = prime_ndx + 1
+	return primes
