@@ -1,20 +1,13 @@
 import json
 import sys
-import os
-from flask import Flask, jsonify
-sys.path.insert(1, os.path.dirname(os.path.realpath(__file__)))
-
-from modules.triples_c_minus_b import triples_for_c_minus_b
-from modules.triples_c import triples_for_c
+sys.path.insert(1, '.')
 from modules.calc_decimal import calc_decimal
-from modules.phi import get_phi_power
+from modules.get_phi import get_phi
+from modules.get_triples import get_triples, get_pythag_by_corner
+from flask import Flask, jsonify
 
 # OUTPUT application/json
 def format_payload(data):
-	data = {
-		'status': 'success',
-		'data': data
-	}
 	str = json.dumps(data, indent=4, separators=(',', ': '))
 	return str, 200, { 'Content-type': 'application/json' }
 
@@ -22,53 +15,45 @@ app = Flask(__name__)
 
 @app.route("/")
 def hello():
-	return "Hello World"
+	return "Hello World!"
 
-# Pythagorean triples for c - b
-# Payload is list of triples, with prime flag for each.
-@app.route('/pythag/<c_minus_b>', methods=['GET'])
-def pythag(c_minus_b):
-	return format_payload(triples_for_c_minus_b(int(c_minus_b)))
+@app.route("/reciprocal/<param_denom>")
+def reciprocal(param_denom):
+	denom = int(param_denom)
+	data = calc_decimal(1, denom, 10)
+	return format_payload({ "Denominator": denom, "data": data })
 
-# Pythagorean triples for optionally specified values of c.
-# Payload is list of triples, with prime flag for each.
-@app.route('/pythag-c', defaults={'c':''}, methods=['GET'])
-@app.route('/pythag-c/<c>', methods=['GET'])
-def pythag_c(c):
-    print('pythag_c; c:', c)
-    if c == '':
-        # if c not specified, use arbitrary range [5..500]
-        c_list = range(5,500)
-    else :
-        # allow comma-delimited list of values in the URL
-        c_list = list(map(lambda x: int(x), c.split(',')))
-    return format_payload(triples_for_c(c_list))
+@app.route("/dc/<param_denom>")
+def dc(param_denom):
+	denom = int(param_denom)
+	data = list(map(lambda num: calc_decimal(num, denom, 10), range(1, denom)))
+	return format_payload(data)
 
-@app.route('/dc/<denom>', defaults={'num': 1, 'base': 10})
-@app.route('/dc/<denom>/<num>', defaults={'base': 10})
-@app.route('/dc/<denom>/<num>/<base>')
-def dc(denom, num, base):
-    denom = int(denom)
-    num = int(num)
-    base = int(base)
-    payload = calc_decimal(num, denom, base)
-    return format_payload(payload)
+
+@app.route('/pythag/<corner>', methods=['GET'])
+def pythag(corner):
+	return format_payload(get_pythag_by_corner(corner))
+
+@app.route('/pythag-c/<param_c_from>/<param_c_to>', methods=['GET'])
+def pythag_c(param_c_from, param_c_to):
+	c_from = int(param_c_from)
+	c_to = int(param_c_to)	
+	return format_payload(get_triples(range(c_from, c_to + 1)))
+
+@app.route('/pythag-clist/<param_clist>', methods=['GET'])
+def pythag_clist(param_clist):
+	clist = list(map(lambda x: int(x), param_clist.split(',')))
+	return format_payload(get_triples(clist))
+
+
 
 @app.route('/phi', defaults={'power': 4})
 @app.route('/phi/<power>', methods=['GET'])
-def phi(power):
+def phi(power: int):
 	power = int(power)
-	return format_payload(get_phi_power(power))
+	return format_payload(get_phi(power))
 
-@app.route('/phi-list', defaults={'upto': 25, 'property': ''})
-@app.route('/phi-list/<upto>', defaults={'property': ''})
-@app.route('/phi-list/<upto>/<property>')
-def phi_list(upto, property):
-    upto = int(upto)
-    payload = []
-    for power in range(1, upto + 1):
-        payload.append(get_phi_power(power, property))
-    return format_payload(payload)
+if __name__ == '__main__':
 
-if __name__ == "__main__":
-    app.run(debug=True)
+    # Run the app
+    app.run(port=8080, host="0.0.0.0")
