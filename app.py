@@ -5,6 +5,7 @@ from modules.calc_decimal import calc_decimal
 from modules.get_phi import get_phi
 from modules.get_triples import get_triples, get_pythag_by_corner
 from flask import Flask, jsonify
+from flask_cors import CORS
 
 # OUTPUT application/json
 def format_payload(data):
@@ -12,6 +13,7 @@ def format_payload(data):
 	return str, 200, { 'Content-type': 'application/json' }
 
 app = Flask(__name__)
+cors = CORS(app)
 
 @app.route("/")
 def hello():
